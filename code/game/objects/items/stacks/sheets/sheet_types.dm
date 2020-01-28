@@ -45,7 +45,8 @@ GLOBAL_LIST_INIT(metal_recipes, list ( \
 	new/datum/stack_recipe("canister", /obj/machinery/portable_atmospherics/canister, 10, time = 15, one_per_turf = TRUE, on_floor = TRUE), \
 	null, \
 	new/datum/stack_recipe("floor tile", /obj/item/stack/tile/plasteel, 1, 4, 20), \
-	new/datum/stack_recipe("metal rod", /obj/item/stack/rods, 1, 2, 60), \
+	 //new/datum/stack_recipe("metal rod", /obj/item/stack/rods, 1, 2, 60), \
+
 	null, \
 	new/datum/stack_recipe("wall girders", /obj/structure/girder, 2, time = 40, one_per_turf = TRUE, on_floor = TRUE), \
 	null, \
@@ -106,6 +107,20 @@ GLOBAL_LIST_INIT(metal_recipes, list ( \
 	grind_results = list(/datum/reagent/iron = 20)
 	point_value = 2
 	tableVariant = /obj/structure/table
+
+/obj/item/stack/sheet/metal/attackby(obj/item/W, mob/user, params)
+	if(W.tool_behaviour == TOOL_WELDER)
+		if(W.use_tool(src, user, 0, volume=40))
+			var/obj/item/stack/rods/two/new_item = new(usr.loc)
+			user.visible_message("[user.name] shapes [src] into metal with the [W].", \
+						 "<span class='notice'>You shape [src] into metal with the [W].</span>", \
+						 "<span class='italics'>You hear welding.</span>")
+			var/obj/item/stack/sheet/metal/M = src
+			src = null
+			var/replace = (user.get_inactive_held_item()==M)
+			M.use(1)
+			if (!M && replace)
+				user.put_in_hands(new_item)
 
 /obj/item/stack/sheet/metal/ratvar_act()
 	new /obj/item/stack/tile/brass(loc, amount)
